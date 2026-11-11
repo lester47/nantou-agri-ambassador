@@ -1,466 +1,379 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>南投 AI 食農小大使</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* 自訂動畫效果 */
-        @keyframes pulse-soft {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-        .animate-pulse-soft {
-            animation: pulse-soft 2s infinite ease-in-out;
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>南投食農小旅行：360° 從產地到餐桌｜國小食農教育數位教材</title>
+  <meta name="description" content="國小食農教育：透過 360° 全景走訪南投鹿谷、魚池、埔里、信義、竹山五大產地生活，挑戰生存問答領取探險家證書！">
+
+  <!-- Google Fonts: Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- Pannellum 360 Viewer CSS (本地優先，完全支援離線使用) -->
+  <link rel="stylesheet" href="css/pannellum.css">
+
+  <!-- 主樣式表 -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen pb-12">
+<body>
 
-    <!-- 頂部導覽列 -->
-    <header class="bg-green-600 text-white shadow-md p-4 sticky top-0 z-50">
-        <div class="max-w-3xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-robot text-3xl"></i>
-                <h1 class="text-2xl font-bold tracking-wide">南投 AI 食農小大使</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <!-- 隱藏的後台開關 -->
-                <button onclick="toggleAdmin()" class="text-green-200 hover:text-white transition" title="開啟教師後台">
-                    <i class="fa-solid fa-gear text-xl"></i>
-                </button>
-                <div class="text-sm bg-green-700 px-3 py-1 rounded-full border border-green-500">
-                    <i class="fa-solid fa-wifi mr-1"></i> 系統連線中
-                </div>
-            </div>
+  <!-- ================= 頂部全域功能列 ================= -->
+  <header class="app-header">
+    <div class="brand-wrap">
+      <span class="brand-icon">🌱</span>
+      <div>
+        <h1 class="brand-title">南投食農小旅行</h1>
+      </div>
+      <span class="brand-tag">社會五上・第 66～75 頁</span>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="header-tool-btn open-comparison-btn" title="查看五大產地比較表">
+        📊 產地農產比較表
+      </button>
+      <button type="button" class="sound-toggle-btn" title="切換音效開關">
+        🔊 音效開
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= 畫面 1：首頁 (Home Screen) ================= -->
+  <main id="home-screen" class="screen">
+    <div class="home-container">
+      <div class="hero-mascot-wrap">
+        <img src="img/mascot.png" alt="茶芽小隊長" class="hero-mascot-img">
+      </div>
+
+      <span class="home-badge-tag">🌟 國小社會五上 數位 360° 互動教材</span>
+      <h2 class="home-title">南投食農小旅行<br>360° 從產地到餐桌</h2>
+      <p class="home-desc">
+        搭上食農小火車走訪南投五大產地，轉動 360° 全景畫面找出產地線索，完成闖關任務，成為南投食農小大使！
+      </p>
+
+      <div id="home-progress-tag" class="progress-notify-tag hidden"></div>
+
+      <div class="home-login-card">
+        <label for="player-name-input" class="input-label">請輸入小大使姓名：</label>
+        <div class="input-group">
+          <input type="text" id="player-name-input" class="name-input" placeholder="例如：林小明 或 座號 12 號" maxlength="10" autocomplete="off">
+          <button type="button" id="start-adventure-btn" class="primary-btn pulse-glow">
+            🚂 搭上食農小火車
+          </button>
         </div>
-    </header>
+      </div>
 
-    <main class="max-w-3xl mx-auto mt-6 px-4 space-y-6">
+      <div class="home-actions">
+        <button type="button" id="reset-progress-btn" class="secondary-btn">
+          🔄 重新出發（清除進度）
+        </button>
+      </div>
+    </div>
+  </main>
 
-        <!-- 步驟一 & 二：教師幕後控制台 (預設隱藏) -->
-        <section id="adminPanel" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hidden">
-            <h2 class="text-lg font-bold text-slate-700 mb-3 border-b pb-2">
-                <i class="fa-solid fa-gear text-slate-400 mr-2"></i>幕後控制台 (教師/開發者專用)
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- API 金鑰鎖定 -->
-                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">1. 資安設定 (API Key)</label>
-                    <div class="flex space-x-2">
-                        <input type="password" id="apiKeyInput" placeholder="輸入 Gemini API Key" class="flex-1 text-sm px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <button id="lockKeyBtn" onclick="lockAPIKey()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-md text-sm transition-colors">
-                            <i class="fa-solid fa-lock"></i> 鎖定
-                        </button>
-                    </div>
-                    <p id="keyStatus" class="text-xs text-slate-400 mt-2">目前狀態：未鎖定</p>
-                </div>
-                <!-- 序列埠連線 -->
-                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">2. 硬體連線 (Web Serial)</label>
-                    <button id="connectSerialBtn" onclick="connectSerial()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex justify-center items-center">
-                        <i class="fa-brands fa-usb mr-2"></i> 連線 micro:bit 讀卡機
-                    </button>
-                    <p id="serialStatus" class="text-xs text-slate-400 mt-2 text-center">請接上 USB 測試</p>
-                </div>
+  <!-- ================= 畫面 2：時光機選單 (Timeline Screen) ================= -->
+  <main id="timeline-screen" class="screen hidden">
+    <div class="timeline-container">
+      <div class="timeline-header">
+        <h2>🗺️ 南投產地地圖</h2>
+        <p>歡迎小大使 <strong id="timeline-player-name" style="color: var(--color-primary);"></strong>！請依序走訪南投五大產地：</p>
+      </div>
+
+      <!-- 時間軸視覺軸線 -->
+      <div class="timeline-bar">
+        <div class="timeline-node" style="left: 5%;">
+          <div class="node-dot"></div>
+          <span class="node-label">50,000 年前</span>
+        </div>
+        <div class="timeline-node" style="left: 40%;">
+          <div class="node-dot"></div>
+          <span class="node-label">7,000 年前</span>
+        </div>
+        <div class="timeline-node" style="left: 75%;">
+          <div class="node-dot"></div>
+          <span class="node-label">2,000 年前</span>
+        </div>
+        <div class="timeline-node" style="left: 98%;">
+          <div class="node-dot" style="border-color: #1976d2;"></div>
+          <span class="node-label">🍽️ 餐桌</span>
+        </div>
+      </div>
+
+      <!-- 三個時代關卡卡片 -->
+      <div id="era-cards-container" class="era-cards-grid"></div>
+
+      <!-- 三關全通關時出現的大魔王與證書彩帶 -->
+      <div id="timeline-cert-banner" class="cert-banner hidden">
+        <div class="cert-banner-text">
+          <h3>🎉 恭喜走完南投五大產地！</h3>
+          <p>準備好領取「南投食農小大使」證書了嗎？</p>
+        </div>
+        <button type="button" id="view-final-cert-btn" class="primary-btn pulse-glow">
+          🏆 前往領取食農小大使證書
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 畫面 3：360° 探索畫面 (Viewer Screen) ================= -->
+  <main id="viewer-screen" class="screen hidden viewer-maximized">
+    <!-- Pannellum 檢視器全景畫布 (100% 滿版無黑邊) -->
+    <div id="panorama"></div>
+
+    <!-- 頂部浮動儀表列 (Floating Top HUD) -->
+    <div class="hud-top-bar">
+      <!-- 左上角：返回按鈕 + 時代遺址資訊膠囊 -->
+      <div class="hud-top-left">
+        <button type="button" id="back-to-timeline-btn" class="hud-btn hud-back-btn" title="返回產地地圖">
+          <span class="hud-btn-icon">⬅</span>
+          <span class="hud-btn-text">回產地地圖</span>
+        </button>
+        <div class="hud-era-pill">
+          <span id="scene-era-title" class="hud-era-title">產地名稱</span>
+          <span class="hud-pill-divider">·</span>
+          <span id="scene-era-info" class="hud-era-info">產地資訊</span>
+        </div>
+      </div>
+
+      <!-- 右上角：浮動線索雷達選單 + 探索進度 + 音效開關 -->
+      <div class="hud-top-right">
+        <!-- 線索雷達下拉選單 -->
+        <div class="clue-radar-dropdown" id="clue-radar-dropdown">
+          <button type="button" id="clue-radar-toggle-btn" class="hud-btn hud-radar-btn" aria-expanded="false" title="開啟本關生活線索清單">
+            <span class="radar-btn-icon">🧭</span>
+            <span class="radar-btn-text">線索雷達</span>
+            <span id="radar-progress-badge" class="radar-progress-badge">0 / 6</span>
+            <span class="radar-arrow">▾</span>
+          </button>
+
+          <!-- 浮動線索清單卡片 -->
+          <div id="clue-radar-menu" class="clue-radar-menu hidden">
+            <div class="radar-menu-header">
+              <div class="radar-menu-title">🧭 生活線索快速雷達</div>
+              <div class="radar-menu-subtitle">點擊線索可自動轉向並開啟內容</div>
             </div>
-        </section>
-
-        <!-- 步驟三：前端體驗展示區 (這就是凱比螢幕上的畫面) -->
-        <section class="bg-white rounded-xl shadow-lg border border-green-100 overflow-hidden relative">
-            <!-- 模擬刷卡按鈕 (預覽用) -->
-            <div class="bg-green-50 p-3 flex justify-center space-x-4 border-b border-green-100">
-                <span class="text-sm font-bold text-green-800 flex items-center">模擬評審刷卡：</span>
-                <button onclick="simulateScan('P01')" class="bg-white border border-green-300 hover:bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm shadow-sm transition transform hover:scale-105">
-                    💳 刷 竹山地瓜
-                </button>
-                <button onclick="simulateScan('P02')" class="bg-white border border-red-300 hover:bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm shadow-sm transition transform hover:scale-105">
-                    💳 刷 草屯麻糬
-                </button>
+            <div id="clue-radar-items" class="clue-radar-items-list">
+              <!-- 由 JS 動態注入線索按鈕 -->
             </div>
+          </div>
+        </div>
 
-            <!-- 主要資訊看板 -->
-            <div id="dashboardArea" class="p-6 md:p-8 hidden fade-in">
-                
-                <!-- 標題與圖示 -->
-                <div class="text-center mb-6">
-                    <div id="itemIcon" class="text-6xl mb-3 animate-pulse-soft">🍠</div>
-                    <h2 id="itemTitle" class="text-3xl font-extrabold text-slate-800">竹山無毒紅土地瓜</h2>
-                    <p id="itemLocation" class="text-slate-500 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>南投縣竹山鎮</p>
-                </div>
+        <!-- 探索計數相容標籤 -->
+        <div id="clue-counter" class="hud-clue-counter hidden">
+          <span>🔍 線索</span> <strong>0 / 6</strong>
+        </div>
 
-                <!-- 數據標籤區 (食安與碳足跡) -->
-                <div class="space-y-3 mb-6">
-                    <!-- 過敏原標籤 -->
-                    <div id="allergenBadge" class="flex items-center p-3 rounded-lg bg-green-100 text-green-800 border border-green-200">
-                        <i id="allergenIcon" class="fa-solid fa-shield-check text-xl mr-3"></i>
-                        <span id="allergenText" class="font-bold text-lg">🟢 食安檢測：安全低敏 (優質原型澱粉)</span>
-                    </div>
-                    <!-- 碳足跡標籤 -->
-                    <div id="carbonBadge" class="flex items-center p-3 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <i class="fa-solid fa-leaf text-xl mr-3"></i>
-                        <span id="carbonText" class="font-bold">🌱 碳足跡：在地產銷 30km (減碳 96%)</span>
-                    </div>
-                </div>
+        <!-- 音效切換 -->
+        <button type="button" class="hud-btn sound-toggle-btn" title="切換音效開關">
+          🔊 音效開
+        </button>
+      </div>
+    </div>
 
-                <!-- AI 對話框 (凱比說故事) -->
-                <div class="relative bg-slate-50 rounded-2xl p-5 border-2 border-slate-200 mb-8">
-                    <!-- 凱比頭像裝飾 -->
-                    <div class="absolute -top-5 left-6 bg-white rounded-full p-1 border-2 border-slate-200">
-                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Kebbi&backgroundColor=b6e3f4" alt="Kebbi" class="w-10 h-10 rounded-full">
-                    </div>
-                    <p class="text-xs font-bold text-slate-400 mb-2 ml-14">食農小大使 - 凱比</p>
-                    <p id="aiStoryText" class="text-slate-700 text-lg leading-relaxed ml-2 font-medium">
-                        這顆竹山地瓜超級健康喔，而且在地種植幫地球省下好多力氣！
-                    </p>
-                    <button onclick="replayVoice()" class="absolute bottom-3 right-3 text-slate-400 hover:text-green-600 transition">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </button>
-                </div>
+    <!-- 畫面底端引導與生存挑戰列 (Floating Bottom HUD) -->
+    <div class="scene-bottom-bar">
+      <!-- 考古小隊長語音提示盒 -->
+      <div class="captain-helper-box">
+        <img src="img/mascot.png" alt="茶芽小隊長" class="captain-avatar-img">
+        <div class="speech-bubble">
+          <span class="captain-speaker-name">茶芽小隊長：</span>
+          <span id="captain-speech-text">轉動畫面看看四周，發光的金色圓點就是線索喔！</span>
+        </div>
+      </div>
 
-                <!-- 行動呼籲 (互動與下單) -->
-                <div class="border-t pt-6">
-                    <p class="text-sm text-slate-500 mb-3 text-center">您的回饋與支持將直接幫助在地小農</p>
-                    <div class="flex flex-col space-y-3">
-                        <button id="likeBtn" onclick="addLike()" class="bg-white border-2 border-orange-400 text-orange-600 hover:bg-orange-50 font-bold py-3 px-4 rounded-xl transition duration-200 flex justify-center items-center text-lg shadow-sm">
-                            <i class="fa-regular fa-thumbs-up mr-2"></i> <span id="likeText">給小農按讚 (150)</span>
-                        </button>
-                        <button onclick="toggleOrder()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md flex justify-center items-center text-lg">
-                            <i class="fa-solid fa-cart-shopping mr-2"></i> 我要支持小農！(產地直購)
-                        </button>
-                    </div>
-                </div>
+      <!-- 右下角功能按鈕組 -->
+      <div class="scene-actions-right">
+        <button type="button" id="guide-clue-btn" class="compass-guide-btn" title="把鏡頭轉向尚未發現的線索">
+          🧭 找不到線索？指引我！
+        </button>
+        <button type="button" id="start-challenge-btn" class="challenge-start-btn disabled" disabled title="找齊所有線索後即可開啟闖關任務">
+          🌱 開始闖關任務
+        </button>
+      </div>
+    </div>
+  </main>
 
-                <!-- 隱藏的直購 QR Code 區域 -->
-                <div id="orderSection" class="hidden mt-4 bg-orange-50 border border-orange-200 rounded-xl p-5 text-center fade-in">
-                    <h3 class="font-bold text-orange-800 text-lg mb-2"><i class="fa-solid fa-box-open mr-2"></i>產地直購通道已開啟！</h3>
-                    <div class="bg-white p-3 inline-block rounded-lg shadow-sm mb-3">
-                        <!-- 模擬 QR Code -->
-                        <div class="w-40 h-40 bg-slate-200 flex items-center justify-center border-4 border-slate-800 rounded">
-                            <i class="fa-solid fa-qrcode text-6xl text-slate-800"></i>
-                        </div>
-                    </div>
-                    <p class="text-sm text-orange-700 font-medium">家長請直接手機掃碼下單</p>
-                    <p class="text-xs text-orange-600 mt-1">此訂單跳過中盤商，100% 成為南投小農的實質收入！</p>
-                </div>
+  <!-- ================= 畫面 4：問答挑戰畫面 (Quiz Screen) ================= -->
+  <main id="quiz-screen" class="screen hidden">
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <h2 id="quiz-era-name">產地・闖關任務</h2>
+        <span id="quiz-progress" class="quiz-progress-pill">第 1 / 4 題</span>
+      </div>
 
-                <!-- 重新辨識按鈕 -->
-                <div class="mt-8 text-center border-t pt-6">
-                    <button onclick="resetToWaiting()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 px-6 rounded-full transition duration-200 shadow-sm flex justify-center items-center mx-auto">
-                        <i class="fa-solid fa-rotate-right mr-2"></i> 辨識其他農產品
-                    </button>
-                </div>
+      <div class="quiz-card">
+        <div class="quiz-question-row">
+          <div id="quiz-question-text" class="quiz-question-text">題目載入中...</div>
+          <button type="button" id="quiz-speak-btn" class="speak-btn" title="朗讀題目與選項">
+            🔊 唸給我聽
+          </button>
+        </div>
 
-            </div>
-            
-            <!-- 待命畫面 (輸入方式選擇區) -->
-            <div id="waitingArea" class="p-6 md:p-10 fade-in">
-                
-                <!-- 選擇面板 -->
-                <div id="selectionPanel" class="text-center">
-                    <h3 class="text-2xl font-extrabold text-slate-700 mb-2">請選擇你要如何認識農產品？</h3>
-                    <p class="text-slate-500 mb-8">凱比大腦支援三種智慧辨識方式喔！</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- 選項 1：拍照 -->
-                        <div onclick="startInputMode('camera')" class="bg-white border-2 border-slate-100 hover:border-blue-400 rounded-2xl p-6 cursor-pointer transition transform hover:-translate-y-2 shadow-sm hover:shadow-md group">
-                            <div class="w-16 h-16 mx-auto bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-3xl mb-4 group-hover:bg-blue-500 group-hover:text-white transition">
-                                <i class="fa-solid fa-camera"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-700 mb-1">AI 拍照辨識</h4>
-                            <p class="text-xs text-slate-500">拍下真實食物外觀</p>
-                        </div>
-                        
-                        <!-- 選項 2：掃條碼 -->
-                        <div onclick="startInputMode('barcode')" class="bg-white border-2 border-slate-100 hover:border-green-400 rounded-2xl p-6 cursor-pointer transition transform hover:-translate-y-2 shadow-sm hover:shadow-md group">
-                            <div class="w-16 h-16 mx-auto bg-green-50 text-green-500 rounded-full flex items-center justify-center text-3xl mb-4 group-hover:bg-green-500 group-hover:text-white transition">
-                                <i class="fa-solid fa-barcode"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-700 mb-1">掃描產銷條碼</h4>
-                            <p class="text-xs text-slate-500">掃描包裝上的 QR Code</p>
-                        </div>
+        <!-- 選項按鈕列表 -->
+        <div id="quiz-options-container" class="quiz-options-list"></div>
 
-                        <!-- 選項 3：RFID -->
-                        <div onclick="startInputMode('rfid')" class="bg-white border-2 border-slate-100 hover:border-orange-400 rounded-2xl p-6 cursor-pointer transition transform hover:-translate-y-2 shadow-sm hover:shadow-md group">
-                            <div class="w-16 h-16 mx-auto bg-orange-50 text-orange-500 rounded-full flex items-center justify-center text-3xl mb-4 group-hover:bg-orange-500 group-hover:text-white transition">
-                                <i class="fa-solid fa-id-card"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-700 mb-1">感應學習圖卡</h4>
-                            <p class="text-xs text-slate-500">將卡片靠近 micro:bit</p>
-                        </div>
-                    </div>
-                </div>
+        <!-- 答題反饋與提示區 -->
+        <div id="quiz-feedback" class="quiz-feedback-box hidden">
+          <div id="quiz-feedback-text"></div>
+        </div>
+      </div>
 
-                <!-- 模擬掃描/感應的動態覆蓋層 -->
-                <div id="scanningOverlay" class="hidden mt-6 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-8 relative overflow-hidden text-center">
-                    <div class="absolute inset-0 bg-blue-100 opacity-20 animate-pulse"></div>
-                    <i id="scanIcon" class="fa-solid fa-camera text-5xl text-slate-400 mb-4 animate-bounce"></i>
-                    <h4 id="scanTitle" class="text-xl font-bold text-slate-700">準備中...</h4>
-                    <p id="scanDesc" class="text-slate-500 mt-2 mb-6">請稍候</p>
-                    
-                    <button onclick="cancelInputMode()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-full text-sm font-bold transition relative z-10">
-                        <i class="fa-solid fa-xmark mr-1"></i> 取消
-                    </button>
-                    
-                    <!-- 開發測試用的模擬觸發按鈕 (僅在掃描模式中顯示) -->
-                    <div class="mt-8 pt-6 border-t border-slate-200 w-full relative z-10 text-left">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3 text-center">Demo 模擬觸發 (20 種南投農產)：</span>
-                        <div id="demoGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-48 overflow-y-auto p-2 bg-white border border-slate-200 rounded-xl shadow-inner">
-                            <!-- 按鈕將由 JavaScript 動態生成 -->
-                        </div>
-                    </div>
-                </div>
+      <div class="quiz-footer-actions">
+        <button type="button" id="quiz-back-to-scene-btn" class="secondary-btn">
+          🔍 回 360° 場景看一下線索
+        </button>
+        <button type="button" id="quiz-next-btn" class="primary-btn hidden">
+          下一題 ➔
+        </button>
+      </div>
+    </div>
+  </main>
 
-            </div>
-        </section>
+  <!-- ================= 畫面 5：證書頁 (Certificate Screen) ================= -->
+  <main id="certificate-screen" class="screen hidden">
+    <div class="cert-page-container">
+      <div class="cert-page-header">
+        <h2>🎉 恭喜榮獲食農小大使證書！</h2>
+        <p>你已經走完南投五大產地，表現優異，快下載或列印你的榮譽證書吧！</p>
+      </div>
 
-    </main>
+      <!-- 證書 Canvas 預覽 -->
+      <div class="cert-canvas-wrap">
+        <canvas id="certificate-canvas"></canvas>
+      </div>
 
-    <script>
-        // --- 1. 資料庫設計 (20 種南投核心農產) ---
-        const database = {
-            'P01': { icon: '🍠', title: '竹山無毒紅土地瓜', location: '南投縣竹山鎮', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全低敏 (原型澱粉)', carbonText: '🌱 碳足跡：在地產銷 30km (減碳 96%)', story: '這顆竹山地瓜超級健康喔，而且在地種植幫地球省下好多力氣！小農阿伯每天早上五點就去田裡挖地瓜，超級辛苦的！我們大家一起給他按個讚吧！', likes: 150 },
-            'P02': { icon: '🍡', title: '草屯手工花生麻糬', location: '南投縣草屯鎮', allergenClass: 'bg-red-100 text-red-800 border-red-200', allergenIcon: 'fa-triangle-exclamation', allergenText: '🔴 食安警報：含重大過敏原 (花生、糯米)', carbonText: '🌱 碳足跡：使用在地糯米，低碳生產', story: '警報！這款好吃的麻糬裡面有包花生喔！會對花生過敏的小朋友千萬不可以吃！安全第一！但是沒過敏的爸爸媽媽，掃描下面條碼就可以買回家囉！', likes: 88 },
-            'P03': { icon: '🍵', title: '鹿谷凍頂烏龍茶', location: '南投縣鹿谷鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (天然茶葉)', carbonText: '🌱 碳足跡：在地烘焙 (低碳排)', story: '這杯鹿谷烏龍茶超香的！小農伯伯用心烘焙，完全沒有過敏原，大家可以安心喝喔！', likes: 120 },
-            'P04': { icon: '🫖', title: '魚池日月潭紅茶', location: '南投縣魚池鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (台茶18號)', carbonText: '🌱 碳足跡：產地直送 (極低食物里程)', story: '名揚國際的日月潭紅玉紅茶！喝起來有淡淡的薄荷跟肉桂香，是外國遊客最愛的伴手禮！', likes: 250 },
-            'P05': { icon: '☕', title: '國姓精品咖啡', location: '南投縣國姓鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (天然咖啡豆)', carbonText: '🌱 碳足跡：在地水洗烘焙 (減碳 90%)', story: '國姓鄉的咖啡豆可是有身分證的喔！喝在地咖啡可以省下好幾千公里的飛機碳排放呢！', likes: 180 },
-            'P06': { icon: '💛', title: '埔里大坪頂百香果', location: '南投縣埔里鎮', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (富含維他命C)', carbonText: '🌱 碳足跡：吊網採收 (友善環境)', story: '酸酸甜甜的百香果！埔里的農夫睡在吊網上保護它們，確保每顆果實都不會掉到地上摔壞喔！', likes: 300 },
-            'P07': { icon: '🍍', title: '名間金鑽鳳梨', location: '南投縣名間鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (天然酵素)', carbonText: '🌱 碳足跡：在地鮮採直送', story: '名間鄉的紅土種出來的鳳梨超級甜！滿滿的酵素對身體很好喔！', likes: 110 },
-            'P08': { icon: '🍇', title: '信義巨峰葡萄', location: '南投縣信義鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (高山栽種)', carbonText: '🌱 碳足跡：溫室精緻管理', story: '信義鄉的高山溫差，讓葡萄變得又黑又甜！連皮吃營養最高喔！', likes: 210 },
-            'P09': { icon: '🍌', title: '集集山蕉', location: '南投縣集集鎮', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (天然鉀離子)', carbonText: '🌱 碳足跡：在地熟成', story: '集集山蕉以前可是日本天皇的御用貢品呢！口感超級Q彈！', likes: 160 },
-            'P10': { icon: '🍈', title: '水里火龍果', location: '南投縣水里鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (花青素)', carbonText: '🌱 碳足跡：夜間點燈催花', story: '紅肉火龍果吃完嘴巴會紅紅的喔！裡面有滿滿的抗氧化物，讓你變漂亮！', likes: 140 },
-            'P11': { icon: '🥬', title: '埔里茭白筍', location: '南投縣埔里鎮', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (水生蔬菜)', carbonText: '🌱 碳足跡：優質湧泉灌溉', story: '這可是有美人腿之稱的茭白筍！埔里乾淨的水質讓它吃起來像水梨一樣甜！', likes: 280 },
-            'P12': { icon: '🍄', title: '仁愛高山香菇', location: '南投縣仁愛鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (段木栽培)', carbonText: '🌱 碳足跡：林下經濟 (促進碳匯)', story: '生長在海拔一千公尺以上的香菇！吸飽了森林的芬多精，煮湯最棒了！', likes: 175 },
-            'P13': { icon: '🧅', title: '中寮爽脆洋蔥', location: '南投縣中寮鄉', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (天然辛香料)', carbonText: '🌱 碳足跡：露天栽種', story: '中寮的洋蔥不辣又帶點甜味，炒蛋最好吃了！', likes: 90 },
-            'P14': { icon: '🥖', title: '溪頭咬人貓麵包', location: '南投縣鹿谷鄉', allergenClass: 'bg-red-100 text-red-800 border-red-200', allergenIcon: 'fa-triangle-exclamation', allergenText: '🔴 食安警報：含過敏原 (小麥/蛋/奶)', carbonText: '🌱 碳足跡：在地文創烘焙', story: '妖怪村的超人氣麵包！上面真的有一片咬人貓的葉子喔！會對蛋奶過敏的小朋友要注意！', likes: 320 },
-            'P15': { icon: '🥮', title: '微熱山丘土鳳梨酥', location: '南投縣南投市', allergenClass: 'bg-red-100 text-red-800 border-red-200', allergenIcon: 'fa-triangle-exclamation', allergenText: '🔴 食安警報：含過敏原 (小麥/蛋/奶)', carbonText: '🌱 碳足跡：契作鳳梨 (保障農民收益)', story: '南投最出名的伴手禮！酸酸的土鳳梨餡超好吃，但也含有小麥跟雞蛋過敏原喔。', likes: 450 },
-            'P16': { icon: '🍯', title: '中寮龍眼蜂蜜', location: '南投縣中寮鄉', allergenClass: 'bg-yellow-100 text-yellow-800 border-yellow-200', allergenIcon: 'fa-triangle-exclamation', allergenText: '🟡 食安警報：嬰幼兒忌食 (一歲以下勿食用)', carbonText: '🌱 碳足跡：蜜蜂自然採集 (友善生態)', story: '中寮的蜜蜂好勤勞！但是記得喔，一歲以下的小Baby腸胃還沒長大，不可以吃蜂蜜喔！', likes: 200 },
-            'P17': { icon: '🍷', title: '信義梅子酒', location: '南投縣信義鄉', allergenClass: 'bg-yellow-100 text-yellow-800 border-yellow-200', allergenIcon: 'fa-triangle-exclamation', allergenText: '🟡 食安警報：含酒精 (未成年請勿飲酒)', carbonText: '🌱 碳足跡：傳統釀造', story: '香醇的梅子酒！這是大人專屬的飲料，小朋友不可以偷喝喔！', likes: 280 },
-            'P18': { icon: '🌹', title: '埔里食用玫瑰', location: '南投縣埔里鎮', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (無毒網室)', carbonText: '🌱 碳足跡：無農藥生態管理', story: '哇！是可以吃的玫瑰花耶！埔里的農夫完全不用農藥，泡茶喝會有淡淡的香味喔！', likes: 130 },
-            'P19': { icon: '🧄', title: '竹山特級冬筍', location: '南投縣竹山鎮', allergenClass: 'bg-green-100 text-green-800 border-green-200', allergenIcon: 'fa-shield-check', allergenText: '🟢 食安檢測：安全無敏 (高纖維)', carbonText: '🌱 碳足跡：冬季限定鮮採', story: '冬天最珍貴的寶石！竹山的冬筍藏在土裡很難挖，煮湯超級鮮甜！', likes: 190 },
-            'P20': { icon: '🐟', title: '日月潭總統魚', location: '南投縣魚池鄉', allergenClass: 'bg-yellow-100 text-yellow-800 border-yellow-200', allergenIcon: 'fa-triangle-exclamation', allergenText: '🟡 食安警報：含魚刺 (兒童食用需注意)', carbonText: '🌱 碳足跡：在地水產', story: '這可是以前總統最愛吃的魚喔！肉質很細，但是有很多小刺，吃的時候要非常小心！', likes: 150 }
-        };
+      <!-- 證書操作功能列 -->
+      <div class="cert-actions-bar">
+        <button type="button" id="download-cert-btn" class="primary-btn pulse-glow">
+          📥 下載證書圖片 (PNG)
+        </button>
+        <button type="button" id="print-cert-btn" class="secondary-btn">
+          🖨️ 列印證書 (A4)
+        </button>
+        <button type="button" class="secondary-btn open-comparison-btn">
+          📊 產地農產比較表
+        </button>
+        <button type="button" id="cert-back-home-btn" class="secondary-btn">
+          🏠 回產地地圖
+        </button>
+      </div>
+    </div>
+  </main>
 
-        // 狀態變數
-        let currentItem = null;
-        let isSpeaking = false;
-        let availableVoices = [];
+  <!-- ================= 彈窗 1：線索小卡 (Clue Modal) ================= -->
+  <div id="clue-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="clue-modal-card">
+      <div id="clue-icon" class="clue-icon-huge">🏠</div>
+      <h3 id="clue-title" class="clue-modal-title">海邊的天然岩洞</h3>
+      <div id="clue-text" class="clue-modal-text">
+        這裡的人住在海邊的岩洞裡。岩洞可以遮風避雨，旁邊又有河流，喝水、取水都很方便！
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="clue-speak-btn" class="speak-btn">
+          🔊 唸給我聽
+        </button>
+        <button type="button" id="clue-close-btn" class="primary-btn">
+          我知道了！
+        </button>
+      </div>
+    </div>
+  </div>
 
-        // 預先載入語音庫 (解決瀏覽器語音非同步載入問題)
-        window.speechSynthesis.onvoiceschanged = () => {
-            availableVoices = window.speechSynthesis.getVoices();
-        };
+  <!-- ================= 彈窗 2：過關勝利徽章彈窗 (Victory Modal) ================= -->
+  <div id="victory-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="victory-card">
+      <img id="victory-badge-img" src="img/badges/paleolithic.png" alt="過關徽章" class="victory-badge-large">
+      <h3 class="victory-title">闖關成功！</h3>
+      <div id="victory-badge-title" class="victory-badge-name">🔥 榮獲「生火打石小達人」徽章！</div>
+      <div class="victory-speech-box">
+        <p id="victory-speech-text">恭喜你完成這一站的任務！</p>
+      </div>
+      <button type="button" id="victory-next-btn" class="primary-btn pulse-glow">
+        前往下一個產地 ➔
+      </button>
+    </div>
+  </div>
 
-        // --- 動態產生 20 種農產的模擬按鈕 ---
-        function initDemoButtons() {
-            const grid = document.getElementById('demoGrid');
-            if(!grid) return;
-            grid.innerHTML = ''; // 清空
-            for(const key in database) {
-                const item = database[key];
-                const btn = document.createElement('button');
-                
-                // 根據過敏原設定按鈕顏色風格
-                let colorClass = 'border-green-200 text-green-700 hover:bg-green-50';
-                if(item.allergenClass.includes('red')) colorClass = 'border-red-200 text-red-700 hover:bg-red-50';
-                if(item.allergenClass.includes('yellow')) colorClass = 'border-yellow-200 text-yellow-700 hover:bg-yellow-50';
+  <!-- ================= 彈窗 3：三個時代比較表 (Comparison Modal) ================= -->
+  <div id="comparison-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="comparison-card">
+      <h2>📊 南投五大產地農產比較總表</h2>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>比較項目</th>
+            <th>舊石器時代（八仙洞）</th>
+            <th>新石器時代（卑南）</th>
+            <th>金屬器時代（十三行）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>代表年代</strong></td>
+            <td>約 50,000 ～ 5,000 年前</td>
+            <td>約 7,000 ～ 2,000 年前</td>
+            <td>約 2,000 ～ 400 年前</td>
+          </tr>
+          <tr>
+            <td><strong>居住方式</strong></td>
+            <td>住在海邊天然岩洞（遮風避雨、靠近水源）</td>
+            <td>以竹子、茅草蓋屋，以板岩為牆與石柱，形成<strong>聚落定居</strong></td>
+            <td>通風涼爽、防潮防獸的<strong>架高干欄式木屋</strong></td>
+          </tr>
+          <tr>
+            <td><strong>食物取得</strong></td>
+            <td>採集野果、狩獵野生動物、河海捕魚（向大自然索取）</td>
+            <td><strong>開始農耕</strong>（種植小米與稻米）、<strong>畜養家畜</strong>（狗、雞）</td>
+            <td>農耕、捕魚，並與外地商人貿易獲得更多資源</td>
+          </tr>
+          <tr>
+            <td><strong>主要工具</strong></td>
+            <td><strong>打製石器</strong>（用石頭敲打出尖銳邊緣）</td>
+            <td><strong>磨製石器</strong>（研磨石刀、石斧）、<strong>陶器</strong>、紡織器具</td>
+            <td><strong>鐵器</strong>（高溫煉鐵、鍛造鐵刀鐵鋤）、石器種類大幅減少</td>
+          </tr>
+          <tr>
+            <td><strong>工藝與技能</strong></td>
+            <td>已知<strong>用火</strong>（燒烤熟食、取暖照明、驅獸）</td>
+            <td><strong>製作陶器</strong>（烹煮與儲存）、<strong>雕刻精美玉器</strong>、織布做衣服</td>
+            <td><strong>高溫煉鐵</strong>、燒製<strong>人面陶罐</strong>與動物陶偶</td>
+          </tr>
+          <tr>
+            <td><strong>對外交流</strong></td>
+            <td>小範圍活動</td>
+            <td>使用花蓮豐田玉，並與<strong>東南亞有海外交流</strong></td>
+            <td>以獸皮與陶器，與海外交換<strong>玻璃飾品、瑪瑙珠與銅幣</strong></td>
+          </tr>
+          <tr>
+            <td><strong>文化核心特質</strong></td>
+            <td colspan="3" style="text-align: center; color: var(--color-primary); font-weight: bold; background: #fff8e1;">
+              💡 <strong>技術與技能具有深厚的「延續性」</strong>：後來的文明在前人的智慧基礎上不斷發明與進步！
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;">
+        <button type="button" id="close-comparison-btn" class="primary-btn">
+          關閉比較表
+        </button>
+      </div>
+    </div>
+  </div>
 
-                btn.className = `bg-white border text-xs sm:text-sm px-2 py-2 rounded-lg shadow-sm transition truncate flex items-center justify-center font-bold ${colorClass}`;
-                btn.innerHTML = `<span class="mr-1 text-lg">${item.icon}</span> <span class="truncate">${item.title}</span>`;
-                btn.onclick = () => simulateScan(key);
-                grid.appendChild(btn);
-            }
-        }
-        
-        // 確保網頁載入時產生按鈕
-        document.addEventListener('DOMContentLoaded', initDemoButtons);
+  <!-- Pannellum 360 Viewer JS (本地優先，完全支援離線使用與 file:/// 免 CORS) -->
+  <script src="js/pannellum.js"></script>
 
-        // --- 輸入模式切換與 UI 管理 ---
-        function startInputMode(mode) {
-            document.getElementById('selectionPanel').classList.add('hidden');
-            const overlay = document.getElementById('scanningOverlay');
-            overlay.classList.remove('hidden');
-            
-            const icon = document.getElementById('scanIcon');
-            const title = document.getElementById('scanTitle');
-            const desc = document.getElementById('scanDesc');
+  <!-- 核心資料與模組腳本 -->
+  <script src="data/eras.js"></script>
+  <script src="data/pano_data.js"></script>
+  <script src="data/cert_data.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/viewer.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/certificate.js"></script>
+  <script src="js/app.js"></script>
 
-            // 根據模式更換 UI 提示
-            if (mode === 'camera') {
-                icon.className = 'fa-solid fa-camera text-5xl text-blue-400 mb-4 animate-bounce';
-                title.innerText = 'AI 視覺相機已啟動';
-                desc.innerText = '請將真實的農產品對準凱比的鏡頭...';
-            } else if (mode === 'barcode') {
-                icon.className = 'fa-solid fa-barcode text-5xl text-green-400 mb-4 animate-pulse';
-                title.innerText = '條碼掃描器已啟動';
-                desc.innerText = '請將產銷履歷 QR Code 或條碼對準鏡頭...';
-            } else if (mode === 'rfid') {
-                icon.className = 'fa-solid fa-wifi text-5xl text-orange-400 mb-4 animate-ping';
-                title.innerText = 'micro:bit 感應器待命中';
-                desc.innerText = '請將您的農產學習圖卡，輕觸 micro:bit 感應區...';
-            }
-        }
-
-        function cancelInputMode() {
-            document.getElementById('scanningOverlay').classList.add('hidden');
-            document.getElementById('selectionPanel').classList.remove('hidden');
-        }
-
-        function resetToWaiting() {
-            // 停止語音
-            window.speechSynthesis.cancel();
-            
-            // 隱藏看板，顯示待命區
-            document.getElementById('dashboardArea').classList.add('hidden');
-            document.getElementById('waitingArea').classList.remove('hidden');
-            
-            // 重置輸入模式回選擇面板
-            cancelInputMode();
-            
-            // 滾動回頂部
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // --- 切換後台顯示 ---
-        function toggleAdmin() {
-            const adminPanel = document.getElementById('adminPanel');
-            adminPanel.classList.toggle('hidden');
-        }
-
-        // --- 2. 系統功能：安全鎖定與硬體連線 ---
-        function lockAPIKey() {
-            const input = document.getElementById('apiKeyInput');
-            if(input.value.trim() === '') {
-                alert('請輸入金鑰後再鎖定！'); return;
-            }
-            input.disabled = true;
-            document.getElementById('lockKeyBtn').innerHTML = '<i class="fa-solid fa-check"></i> 已鎖定';
-            document.getElementById('lockKeyBtn').classList.replace('bg-slate-700', 'bg-green-600');
-            document.getElementById('keyStatus').innerHTML = '<span class="text-green-600 font-bold">已安全鎖定於記憶體中</span>';
-        }
-
-        async function connectSerial() {
-            try {
-                // 模擬 Web Serial API 呼叫 (真實環境需使用 navigator.serial.requestPort())
-                document.getElementById('serialStatus').innerText = '正在尋找設備...';
-                setTimeout(() => {
-                    document.getElementById('connectSerialBtn').innerHTML = '<i class="fa-solid fa-link"></i> 已連線 micro:bit (COM3)';
-                    document.getElementById('connectSerialBtn').classList.replace('bg-blue-600', 'bg-green-600');
-                    document.getElementById('serialStatus').innerText = '準備就緒，可開始刷卡';
-                }, 1000);
-            } catch (err) {
-                console.error('Serial connection failed', err);
-            }
-        }
-
-        // --- 3. 核心互動：模擬刷卡與 UI 更新 ---
-        function simulateScan(itemId) {
-            const data = database[itemId];
-            if (!data) return;
-            currentItem = data;
-
-            // 隱藏待命區，顯示儀表板
-            document.getElementById('waitingArea').classList.add('hidden');
-            const dashboard = document.getElementById('dashboardArea');
-            dashboard.classList.remove('hidden');
-            
-            // 重置動畫
-            dashboard.classList.remove('fade-in');
-            void dashboard.offsetWidth; // trigger reflow
-            dashboard.classList.add('fade-in');
-
-            // 隱藏訂單區
-            document.getElementById('orderSection').classList.add('hidden');
-
-            // 更新 UI 內容
-            document.getElementById('itemIcon').innerText = data.icon;
-            document.getElementById('itemTitle').innerText = data.title;
-            document.getElementById('itemLocation').innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i>${data.location}`;
-            
-            // 更新過敏原標籤 (動態改顏色)
-            const allergenBadge = document.getElementById('allergenBadge');
-            allergenBadge.className = `flex items-center p-3 rounded-lg border ${data.allergenClass}`;
-            document.getElementById('allergenIcon').className = `fa-solid ${data.allergenIcon} text-xl mr-3`;
-            document.getElementById('allergenText').innerText = data.allergenText;
-            
-            document.getElementById('carbonText').innerText = data.carbonText;
-            document.getElementById('aiStoryText').innerText = data.story;
-            document.getElementById('likeText').innerText = `給小農按讚 (${data.likes})`;
-
-            // 稍微延遲一下再講話，感覺更自然
-            setTimeout(() => {
-                speakStory(data.story);
-            }, 300);
-        }
-
-        // --- 4. 語音朗讀功能 (Web Speech API 優化版) ---
-        function speakStory(text) {
-            // 停止之前的語音
-            window.speechSynthesis.cancel();
-            
-            let utterance = new SpeechSynthesisUtterance(text);
-            
-            // 確保語音庫已載入
-            if (availableVoices.length === 0) {
-                availableVoices = window.speechSynthesis.getVoices();
-            }
-
-            // 【關鍵優化】尋找最自然的高音質發音人
-            // 優先找 Chrome 的 Google 雲端語音，其次找微軟的，最後才用預設的
-            let bestVoice = availableVoices.find(v => v.name.includes('Google 國語（臺灣）')) || 
-                            availableVoices.find(v => v.lang === 'zh-TW' && v.name.includes('Google')) ||
-                            availableVoices.find(v => v.lang === 'zh-TW' && v.name.includes('Hanhan')) ||
-                            availableVoices.find(v => v.lang === 'zh-TW');
-
-            if (bestVoice) {
-                utterance.voice = bestVoice;
-            }
-
-            utterance.lang = 'zh-TW';
-            
-            // 【關鍵優化】參數回歸自然，微調即可
-            utterance.pitch = 1.1; // 1.1 微甜，不會過度像花栗鼠失真
-            utterance.rate = 1.0;  // 1.0 正常語速，讓斷句更清楚
-
-            utterance.onstart = () => { isSpeaking = true; };
-            utterance.onend = () => { isSpeaking = false; };
-
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function replayVoice() {
-            if(currentItem) speakStory(currentItem.story);
-        }
-
-        // --- 5. 變現功能：按讚與開啟訂單 ---
-        function addLike() {
-            if (!currentItem) return;
-            currentItem.likes++;
-            document.getElementById('likeText').innerText = `給小農按讚 (${currentItem.likes})`;
-            
-            // 按鈕動態回饋
-            const btn = document.getElementById('likeBtn');
-            btn.classList.add('bg-orange-100');
-            setTimeout(() => btn.classList.remove('bg-orange-100'), 200);
-        }
-
-        function toggleOrder() {
-            const orderSection = document.getElementById('orderSection');
-            orderSection.classList.remove('hidden');
-            // 滾動到最底部方便掃碼
-            setTimeout(() => {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }, 100);
-        }
-    </script>
 </body>
 </html>
