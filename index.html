@@ -52,21 +52,10 @@
             <h2 class="text-lg font-bold text-slate-700 mb-3 border-b pb-2">
                 <i class="fa-solid fa-gear text-slate-400 mr-2"></i>幕後控制台 (教師/開發者專用)
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- API 金鑰鎖定 -->
-                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">1. 資安設定 (API Key)</label>
-                    <div class="flex space-x-2">
-                        <input type="password" id="apiKeyInput" placeholder="輸入 Gemini API Key" class="flex-1 text-sm px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <button id="lockKeyBtn" onclick="lockAPIKey()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-md text-sm transition-colors">
-                            <i class="fa-solid fa-lock"></i> 鎖定
-                        </button>
-                    </div>
-                    <p id="keyStatus" class="text-xs text-slate-400 mt-2">目前狀態：未鎖定</p>
-                </div>
+            <div class="grid grid-cols-1 gap-4">
                 <!-- 序列埠連線 -->
                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">2. 硬體連線 (Web Serial)</label>
+                    <label class="block text-sm font-semibold text-slate-600 mb-2">硬體連線 (Web Serial)</label>
                     <button id="connectSerialBtn" onclick="connectSerial()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex justify-center items-center">
                         <i class="fa-brands fa-usb mr-2"></i> 連線 micro:bit 讀卡機
                     </button>
@@ -337,17 +326,6 @@
         }
 
         // --- 2. 系統功能：安全鎖定與硬體連線 ---
-        function lockAPIKey() {
-            const input = document.getElementById('apiKeyInput');
-            if(input.value.trim() === '') {
-                alert('請輸入金鑰後再鎖定！'); return;
-            }
-            input.disabled = true;
-            document.getElementById('lockKeyBtn').innerHTML = '<i class="fa-solid fa-check"></i> 已鎖定';
-            document.getElementById('lockKeyBtn').classList.replace('bg-slate-700', 'bg-green-600');
-            document.getElementById('keyStatus').innerHTML = '<span class="text-green-600 font-bold">已安全鎖定於記憶體中</span>';
-        }
-
         async function connectSerial() {
             try {
                 // 模擬 Web Serial API 呼叫 (真實環境需使用 navigator.serial.requestPort())
