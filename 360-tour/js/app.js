@@ -400,7 +400,7 @@
         card.innerHTML = `
           <div class="era-card-thumb">
             <img src="${(window.PANO_DATA && window.PANO_DATA[era.id] && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) ? window.PANO_DATA[era.id] : location.protocol.startsWith('http') ? era.panorama + '?t=' + Date.now() : (window.PANO_DATA && window.PANO_DATA[era.id] ? window.PANO_DATA[era.id] : era.panorama)}" alt="${era.name}">
-            <div class="era-years-pill">${era.years}</div>
+            ${era.years ? `<div class="era-years-pill">${era.years}</div>` : ''}
           </div>
           <div class="era-card-body">
             <div class="era-card-title-row">
@@ -469,7 +469,7 @@
       if (titleEl) titleEl.textContent = era.name;
       if (infoEl) {
         const shortSite = era.site.replace(/（.*）/, '');
-        infoEl.textContent = `${era.subtitle ? era.subtitle + ' ｜ ' : ''}${shortSite}（${era.years}）`;
+        infoEl.textContent = `${era.subtitle ? era.subtitle + ' ｜ ' : ''}${shortSite}${era.years ? `（${era.years}）` : ''}`;
       }
 
       // 小隊長初始引導

@@ -1,10 +1,11 @@
 // js/storage.js - 進度儲存與讀取模組
 (function () {
-  const STORAGE_KEY = 'nantou_food_360_progress';
+  const STORAGE_KEY = window.ERAS_DATA?.storageKey || 'nantou_food_360_progress';
+  const firstEra = window.ERAS_DATA?.eras?.[0]?.id || 'dongding';
 
   const defaultState = {
     playerName: '',
-    unlockedEras: ['dongding'],
+    unlockedEras: [firstEra],
     completedEras: [],
     readClues: {
       dongding: [],
@@ -13,7 +14,7 @@
     },
     finalBossCompleted: false,
     soundEnabled: true,
-    lastActiveEra: 'dongding',
+    lastActiveEra: firstEra,
     completedDate: ''
   };
 

@@ -19,6 +19,26 @@
 </head>
 <body>
 
+  <!-- ================= 食農小旅行系列導覽列 ================= -->
+  <nav class="series-nav" id="series-nav" aria-label="南投食農小旅行系列">
+    <a class="series-home" href="../food-tour/">🌱 系列首頁</a>
+    <a href="../360-tour/" class="current" aria-current="page">第一版・從產地到餐桌</a>
+    <a href="../360-tour-2/">第二版・咖啡、香蕉到稻米</a>
+    <a href="../360-tour-v3/">第三版・果園與菇舍</a>
+  </nav>
+  <style>
+    .series-nav { flex: none; display: flex; align-items: center; gap: 6px; padding: 6px 16px; background: #1b5e20; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+    .series-nav::-webkit-scrollbar { display: none; }
+    .series-nav a { color: #e8f5e9; font-size: 14px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-decoration: none; flex: none; }
+    .series-nav a:hover { background: rgba(255, 255, 255, .15); }
+    .series-nav a.current { background: #fff; color: #1b5e20; }
+    .series-nav .series-home { margin-right: 6px; border: 1px solid rgba(255, 255, 255, .45); }
+    @media print { .series-nav { display: none !important; } }
+  </style>
+  <script>
+    if (location.protocol === 'file:') document.getElementById('series-nav').style.display = 'none';
+  </script>
+
   <!-- ================= 頂部全域功能列 ================= -->
   <header class="app-header">
     <div class="brand-wrap">

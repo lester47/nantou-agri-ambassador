@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>南投食農小旅行｜360° 教材系列</title>
+  <meta name="description" content="國小食農教育 360° 互動教材系列：三個版本、十七個南投產地，轉動全景找線索、闖關領證書。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #2e7d32;
+      --green-dark: #1b5e20;
+      --green-soft: #e8f5e9;
+      --earth: #5d4037;
+      --earth-soft: #efebe9;
+      --paper: #fbf8f1;
+      --line: #e3dccd;
+      --orange: #ef6c00;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: var(--paper);
+      color: #3e2723;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    .top {
+      background: #fff;
+      border-bottom: 2px solid var(--line);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 20px; color: var(--green); }
+    .brand span:first-child { font-size: 28px; }
+    .top-link {
+      background: var(--earth-soft);
+      color: var(--earth);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .top-link:hover { background: #e0d6cf; }
+
+    .hero {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 48px 24px 24px;
+      text-align: center;
+    }
+    .hero .badge {
+      display: inline-block;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 900; color: var(--green-dark); letter-spacing: 1px; }
+    .hero p { margin: 12px auto 0; max-width: 640px; font-size: 17px; color: var(--earth); }
+    .stats { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+    .stat {
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 20px;
+      min-width: 120px;
+    }
+    .stat b { display: block; font-size: 26px; color: var(--green); font-weight: 900; line-height: 1.2; }
+    .stat small { font-size: 13px; color: var(--earth); }
+
+    .grid {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px 24px 56px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .card {
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(62, 39, 35, .12); border-color: var(--green); }
+    .thumb { position: relative; aspect-ratio: 2 / 1; background: var(--green-soft); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ver {
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(27, 94, 32, .92); color: #fff;
+      font-weight: 900; font-size: 14px;
+      padding: 4px 12px; border-radius: 999px;
+    }
+    .body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+    .body h2 { font-size: 21px; font-weight: 900; color: var(--green-dark); }
+    .body .sub { font-size: 14px; color: var(--orange); font-weight: 700; margin-top: 2px; }
+    .stations { list-style: none; margin: 14px 0 18px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .stations li {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 13px;
+      padding: 3px 10px;
+      color: var(--earth);
+      white-space: nowrap;
+    }
+    .go {
+      margin-top: auto;
+      display: block;
+      text-align: center;
+      background: var(--green);
+      color: #fff;
+      font-weight: 900;
+      font-size: 16px;
+      padding: 11px;
+      border-radius: 12px;
+    }
+    .card:hover .go { background: var(--green-dark); }
+
+    .howto {
+      max-width: 1080px;
+      margin: 0 auto 56px;
+      padding: 0 24px;
+    }
+    .howto-box {
+      background: #fff;
+      border: 2px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .step { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--earth); }
+    .step b {
+      flex: none;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--green-soft); color: var(--green-dark);
+      display: grid; place-items: center; font-weight: 900;
+    }
+    .step strong { display: block; color: #3e2723; font-size: 15px; }
+
+    footer { text-align: center; font-size: 13px; color: #8d6e63; padding: 0 24px 32px; }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .howto-box { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .top { padding: 10px 16px; }
+      .hero { padding: 32px 16px 16px; }
+      .grid { grid-template-columns: 1fr; padding: 12px 16px 40px; }
+      .howto { padding: 0 16px; }
+      .howto-box { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="./"><span>🌱</span><span>南投食農小旅行</span></a>
+    <a class="top-link" href="../">🤖 南投 AI 食農小大使</a>
+  </header>
+
+  <section class="hero">
+    <span class="badge">🌾 國小食農教育・360° 互動教材系列</span>
+    <h1>搭上食農小火車，走遍南投產地</h1>
+    <p>選一個版本出發！轉動 360° 全景畫面找出產地線索，完成闖關任務，領取「南投食農小大使」證書。</p>
+    <div class="stats">
+      <div class="stat"><b>3</b><small>個版本</small></div>
+      <div class="stat"><b>17</b><small>個產地關卡</small></div>
+      <div class="stat"><b>102</b><small>條產地線索</small></div>
+    </div>
+  </section>
+
+  <main class="grid">
+    <a class="card" href="../360-tour/">
+      <div class="thumb"><img src="img/v1.jpg" alt="鹿谷茶園全景" loading="lazy"><span class="ver">第一版</span></div>
+      <div class="body">
+        <h2>從產地到餐桌</h2>
+        <div class="sub">茶、筍、梅的山城旅行・5 關</div>
+        <ul class="stations">
+          <li>🍵 鹿谷・凍頂烏龍茶</li>
+          <li>🫖 魚池・日月潭紅茶</li>
+          <li>💧 埔里・茭白筍</li>
+          <li>🫙 信義・梅子</li>
+          <li>🎋 竹山・竹筍</li>
+        </ul>
+        <span class="go">🚂 出發第一版</span>
+      </div>
+    </a>
+
+    <a class="card" href="../360-tour-2/">
+      <div class="thumb"><img src="img/v2.jpg" alt="草屯稻田全景" loading="lazy"><span class="ver">第二版</span></div>
+      <div class="body">
+        <h2>咖啡、香蕉到稻米</h2>
+        <div class="sub">加工、催熟與水土保持・6 關</div>
+        <ul class="stations">
+          <li>☕ 國姓・咖啡</li>
+          <li>🍌 集集・香蕉</li>
+          <li>🔥 中寮・龍眼</li>
+          <li>🥬 仁愛・高冷蔬菜</li>
+          <li>🌾 草屯・稻米</li>
+          <li>🍍 名間・鳳梨</li>
+        </ul>
+        <span class="go">🚂 出發第二版</span>
+      </div>
+    </a>
+
+    <a class="card" href="../360-tour-v3/">
+      <div class="thumb"><img src="img/v3.jpg" alt="水里葡萄園全景" loading="lazy"><span class="ver">第三版</span></div>
+      <div class="body">
+        <h2>走進果園與菇舍</h2>
+        <div class="sub">水果與香菇怎麼長出來・6 關</div>
+        <ul class="stations">
+          <li>🌼 埔里・百香果</li>
+          <li>🍄 魚池・香菇</li>
+          <li>🍇 水里・巨峰葡萄</li>
+          <li>🍊 仁愛・甜柿</li>
+          <li>🍓 國姓・草莓</li>
+          <li>🧺 南投市・荔枝</li>
+        </ul>
+        <span class="go">🚂 出發第三版</span>
+      </div>
+    </a>
+  </main>
+
+  <section class="howto">
+    <div class="howto-box">
+      <div class="step"><b>1</b><div><strong>選版本、輸入名字</strong>三個版本可以照順序玩，也可以挑一個。</div></div>
+      <div class="step"><b>2</b><div><strong>轉動全景找線索</strong>發光的圓點就是線索，找齊才能挑戰。</div></div>
+      <div class="step"><b>3</b><div><strong>闖關答題</strong>答錯可以回去看線索，再試一次。</div></div>
+      <div class="step"><b>4</b><div><strong>領取證書</strong>完成終極任務，下載或列印證書。</div></div>
+    </div>
+  </section>
+
+  <footer>南投縣 食農教育推廣教學團隊・三個版本的闖關進度分開儲存，互不影響</footer>
+</body>
+</html>

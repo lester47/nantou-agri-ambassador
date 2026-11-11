@@ -37,7 +37,7 @@
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
       try {
-        let bgSrc = 'img/certificate-bg.png';
+        let bgSrc = erasData.certificateBackground || 'img/certificate-bg.png';
         if (window.CERT_ASSETS && window.CERT_ASSETS.bg) {
           bgSrc = window.CERT_ASSETS.bg;
         }
