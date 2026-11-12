@@ -399,7 +399,7 @@
 
         card.innerHTML = `
           <div class="era-card-thumb">
-            <img src="${(window.PANO_DATA && window.PANO_DATA[era.id] && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) ? window.PANO_DATA[era.id] : location.protocol.startsWith('http') ? era.panorama + '?t=' + Date.now() : (window.PANO_DATA && window.PANO_DATA[era.id] ? window.PANO_DATA[era.id] : era.panorama)}" alt="${era.name}">
+            <img src="${this.eraThumbSrc(era)}" data-full="${era.panorama}" onerror="if(this.src.indexOf('/thumb/')>-1){this.onerror=null;this.src=this.dataset.full;}" loading="lazy" decoding="async" alt="${era.name}">
             <div class="era-years-pill">${era.years}</div>
           </div>
           <div class="era-card-body">
@@ -489,6 +489,16 @@
         // 全部線索找齊事件
         window.AudioManager.playTone(880, 'sine', 0.3);
       });
+    },
+
+    // 地圖小卡縮圖：網站版用 img/pano/thumb/ 的小圖（約 80KB），找不到才退回全景圖；
+    // 本機教師工作台仍用全景圖加防快取戳記，換圖後立即看到
+    eraThumbSrc(era) {
+      const pano = era.panorama || '';
+      if (pano.startsWith('data:')) return pano;
+      if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return pano + '?t=' + Date.now();
+      if (!location.protocol.startsWith('http') && window.PANO_DATA && window.PANO_DATA[era.id]) return window.PANO_DATA[era.id];
+      return pano.replace(/(^|\/)pano\/([^/]+)$/, '$1pano/thumb/$2');
     },
 
     updateCaptainSpeech(text) {

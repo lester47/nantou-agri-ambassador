@@ -69,7 +69,9 @@
       } else if (window.PANO_DATA && window.PANO_DATA[eraData.id] && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
         panoSrc = window.PANO_DATA[eraData.id];
       } else if (location.protocol.startsWith('http')) {
-        panoSrc = (eraData.panorama && !eraData.panorama.startsWith('data:')) ? `${eraData.panorama}?t=${Date.now()}` : eraData.panorama;
+        // 只有電腦本機教師工作台加防快取戳記（換圖馬上看到）；網站版讓瀏覽器快取，第二次進站秒開
+        const noCache = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+        panoSrc = (noCache && eraData.panorama && !eraData.panorama.startsWith('data:')) ? `${eraData.panorama}?t=${Date.now()}` : eraData.panorama;
       } else if (window.PANO_DATA && window.PANO_DATA[eraData.id]) {
         panoSrc = window.PANO_DATA[eraData.id];
       }
