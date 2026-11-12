@@ -1,4 +1,5 @@
 window.ERAS_DATA = {
+  "quizRetry": { "maxWrong": 2 },
   "storageKey": "nantou_food_360_v3_progress",
   "certificateBackground": "../360-tour/img/certificate-bg.png",
   "issuer": "南投縣 食農教育推廣教學團隊",
