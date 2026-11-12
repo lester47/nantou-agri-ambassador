@@ -1,5 +1,6 @@
 // data/eras.js - 自動同步自 eras.json
 window.ERAS_DATA = {
+  "quizRetry": { "maxWrong": 2 },
   "issuer": "南投縣 食農教育推廣教學團隊",
   "appTitle": "南投食農小旅行",
   "appSubtitle": "360° 從產地到餐桌",
